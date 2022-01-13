@@ -1,0 +1,6 @@
+#ifndef SERVERERRDEF_H
+#define SERVERERRDEF_H
+
+#define ERR_SUCCESS 0
+
+#endif // SERVERERRDEF_H
