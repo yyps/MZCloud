@@ -3,7 +3,7 @@
 
 CMainApp::CMainApp()
 {
-
+    m_httpSvr = std::make_shared<CEvHttpServer>(7111);
 }
 
 CMainApp::~CMainApp()
@@ -18,7 +18,9 @@ int CMainApp::Init()
 
 int CMainApp::Run()
 {
-    return ERR_SUCCESS;
+    int err = m_httpSvr->EventLoopDispatch();
+
+    return err;
 }
 
 int CMainApp::Quit()

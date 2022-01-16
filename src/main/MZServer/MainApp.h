@@ -1,6 +1,8 @@
 #ifndef CMAINAPP_H
 #define CMAINAPP_H
 
+#include <libevent/EvHttpWrapper.h>
+
 class CMainApp
 {
 public:
@@ -10,6 +12,10 @@ public:
     int Init();
     int Run();
     int Quit();
+    void http_handle_callback();
+
+private:
+    evhttp_ptr m_httpSvr{nullptr};
 
 };
 
