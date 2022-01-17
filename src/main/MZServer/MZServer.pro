@@ -60,7 +60,9 @@ HEADERS += \
     MainApp.h \
     ServerErrdef.h
 
-
 unix:{
+    # set run path to /usr/local/lib
+    QMAKE_LFLAGS += -Wl,-rpath=/usr/local/lib
+
     LIBS += -L/usr/local/lib -levent
 }
