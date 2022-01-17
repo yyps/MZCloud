@@ -3,6 +3,14 @@
 #include <libevent/evhttp.h>
 #include <iostream>
 
+#ifdef __linux__
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+
+
 CEvHttpServer::CEvHttpServer()
 {
     m_evbase = event_base_new();
@@ -40,17 +48,6 @@ int CEvHttpServer::EventLoopDispatch(const int& port)
     return err;
 }
 
-std::string demo = R"(<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>苗子网盘</title>
-</head>
-<body>
-<h1>苗子网盘</h1>
-<p>老司机带带我，我要去昆明呀！</p>
-</body>
-</html>)";
 void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
 {
     const char *cmdtype;
@@ -98,6 +95,29 @@ void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
     evhttp_add_header(rspheaders, "Content-Type", "text/html");
     struct evbuffer *rspbuf = evhttp_request_get_output_buffer(req);
     assert(rspbuf);
-    evbuffer_add(rspbuf, demo.c_str(), demo.length());
+
+    int fd = -1;
+    struct stat st;
+    do
+    {
+        if ((fd = open("../../res/index.html", O_RDONLY)) < 0)
+        {
+            break;
+        }
+
+        if (fstat(fd, &st) < 0)
+        {
+            break;
+        }
+
+        evbuffer_add_file(rspbuf, fd, 0, st.st_size);
+
+    } while (0);
+
+   // evbuffer_add(rspbuf, demo.c_str(), demo.length());
+
     evhttp_send_reply(req, 200, "OK", NULL);
+
+    if (fd >= 0)
+        close(fd);
 }
