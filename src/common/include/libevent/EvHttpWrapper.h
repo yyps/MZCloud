@@ -10,11 +10,12 @@ typedef void (*event_cb_t)(struct evhttp_request *, void *);
 class CEvHttpServer
 {
 public:
-    CEvHttpServer(const int& port);
+    CEvHttpServer();
     ~CEvHttpServer();
 
     void SetEventCB(event_cb_t cb);
-    int EventLoopDispatch();
+    int EventLoopDispatch(const int& port);
+    static void handle_callback(struct evhttp_request *htpreq, void *usrdata);
 
 private:
     event_base *m_evbase{nullptr};
