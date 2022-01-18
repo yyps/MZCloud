@@ -2,14 +2,7 @@
 #include <assert.h>
 #include <libevent/evhttp.h>
 #include <iostream>
-
-#ifdef __linux__
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#endif
-
+#include <fstream>
 
 CEvHttpServer::CEvHttpServer()
 {
@@ -97,27 +90,33 @@ void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
     assert(rspbuf);
 
     int fd = -1;
-    struct stat st;
     do
     {
-        if ((fd = open("../../res/index.html", O_RDONLY)) < 0)
-        {
+        std::ifstream ifs;
+        ifs.open("../../res/index.html", std::ios::binary|std::ios::in);
+        if (!ifs.is_open())
             break;
-        }
 
-        if (fstat(fd, &st) < 0)
-        {
-            break;
-        }
+        /* read fd */
+        auto rdfd = [](std::filebuf& fb)->int{
+            class _filebuf : public std::filebuf{
+            public:
+                int rdfd(){
+                    return _M_file.fd();
+                }
+            };
+            return static_cast<_filebuf&>(fb).rdfd();
+        };
 
-        evbuffer_add_file(rspbuf, fd, 0, st.st_size);
+        fd = rdfd(*(ifs.rdbuf()));
+        ifs.seekg(0, ifs.end);
+        long size = ifs.tellg();
+
+        evbuffer_add_file(rspbuf, fd, 0, size);
 
     } while (0);
 
    // evbuffer_add(rspbuf, demo.c_str(), demo.length());
 
     evhttp_send_reply(req, 200, "OK", NULL);
-
-    if (fd >= 0)
-        close(fd);
 }
