@@ -173,7 +173,9 @@
 #define EVENT__HAVE_NANOSLEEP 1
 
 /* Define to 1 if you have the <netdb.h> header file. */
+#ifdef __linux__
 #define EVENT__HAVE_NETDB_H 1
+#endif
 
 /* Define to 1 if you have the <netinet/in6.h> header file. */
 /* #undef EVENT__HAVE_NETINET_IN6_H */
@@ -371,7 +373,9 @@
 #define EVENT__HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <sys/uio.h> header file. */
+#ifdef __linux__
 #define EVENT__HAVE_SYS_UIO_H 1
+#endif
 
 /* Define to 1 if you have the <sys/un.h> header file. */
 #define EVENT__HAVE_SYS_UN_H 1

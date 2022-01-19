@@ -1,9 +1,12 @@
 #include <QCoreApplication>
 #include "MainApp.h"
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+
+    qDebug() << QCoreApplication::applicationDirPath();
 
     CMainApp app;
     do

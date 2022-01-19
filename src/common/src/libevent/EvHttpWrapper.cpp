@@ -2,6 +2,9 @@
 #include <assert.h>
 #include <libevent/evhttp.h>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 CEvHttpServer::CEvHttpServer()
 {
@@ -40,17 +43,6 @@ int CEvHttpServer::EventLoopDispatch(const int& port)
     return err;
 }
 
-std::string demo = R"(<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>苗子网盘</title>
-</head>
-<body>
-<h1>苗子网盘</h1>
-<p>老司机带带我，我要去昆明呀！</p>
-</body>
-</html>)";
 void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
 {
     const char *cmdtype;
@@ -98,6 +90,39 @@ void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
     evhttp_add_header(rspheaders, "Content-Type", "text/html");
     struct evbuffer *rspbuf = evhttp_request_get_output_buffer(req);
     assert(rspbuf);
-    evbuffer_add(rspbuf, demo.c_str(), demo.length());
+
+
+    int fd = -1;
+    do
+    {
+        std::ifstream ifs;
+        ifs.open("../../res/index.html", std::ios::binary|std::ios::in);
+        if (!ifs.is_open())
+            break;
+
+        ifs.seekg(0, ifs.end);
+        long size = ifs.tellg();
+
+#ifdef __linux__
+        /* read fd */
+        auto rdfd = [](std::filebuf& fb)->int{
+            class _filebuf : public std::filebuf{
+            public:
+                int rdfd(){
+                    return _M_file.fd();
+                }
+            };
+            return static_cast<_filebuf&>(fb).rdfd();
+        };
+
+        fd = rdfd(*(ifs.rdbuf()));
+        int ee = evbuffer_add_file(rspbuf, fd, 0, size);
+#else
+        ifs.seekg(0, ifs.beg);
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        evbuffer_add(rspbuf, buffer.str().c_str(), buffer.str().length());
+#endif
+    } while (0);
     evhttp_send_reply(req, 200, "OK", NULL);
 }
