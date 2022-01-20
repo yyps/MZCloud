@@ -111,7 +111,6 @@ void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
         fd = rdfd(*(ifs.rdbuf()));
         ifs.seekg(0, ifs.end);
         long size = ifs.tellg();
-
         evbuffer_add_file(rspbuf, fd, 0, size);
 
     } while (0);
