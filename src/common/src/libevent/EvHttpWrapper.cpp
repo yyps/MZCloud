@@ -3,6 +3,8 @@
 #include <libevent/evhttp.h>
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <sstream>
 
 CEvHttpServer::CEvHttpServer()
 {
@@ -89,6 +91,7 @@ void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
     struct evbuffer *rspbuf = evhttp_request_get_output_buffer(req);
     assert(rspbuf);
 
+
     int fd = -1;
     do
     {
@@ -97,6 +100,10 @@ void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
         if (!ifs.is_open())
             break;
 
+        ifs.seekg(0, ifs.end);
+        long size = ifs.tellg();
+
+#ifdef __linux__
         /* read fd */
         auto rdfd = [](std::filebuf& fb)->int{
             class _filebuf : public std::filebuf{
@@ -109,13 +116,13 @@ void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
         };
 
         fd = rdfd(*(ifs.rdbuf()));
-        ifs.seekg(0, ifs.end);
-        long size = ifs.tellg();
-        evbuffer_add_file(rspbuf, fd, 0, size);
-
+        int ee = evbuffer_add_file(rspbuf, fd, 0, size);
+#else
+        ifs.seekg(0, ifs.beg);
+        std::stringstream buffer;
+        buffer << ifs.rdbuf();
+        evbuffer_add(rspbuf, buffer.str().c_str(), buffer.str().length());
+#endif
     } while (0);
-
-   // evbuffer_add(rspbuf, demo.c_str(), demo.length());
-
     evhttp_send_reply(req, 200, "OK", NULL);
 }

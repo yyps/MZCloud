@@ -66,3 +66,8 @@ unix:{
 
     LIBS += -L/usr/local/lib -levent
 }
+
+win32:{
+    LIBS += -L$$PWD/../../../libs/libevent -levent
+    LIBS += -lWs2_32
+}
