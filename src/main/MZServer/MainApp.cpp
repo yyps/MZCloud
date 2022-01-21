@@ -1,5 +1,8 @@
 #include "MainApp.h"
 #include "ServerErrdef.h"
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QDebug>
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -35,8 +38,38 @@ CMainApp::~CMainApp()
 
 int CMainApp::Init()
 {
+    int err = ERR_SUCCESS;
 
-    return ERR_SUCCESS;
+    do
+    {
+        qDebug()<<"Avaliable drivers;";
+        QStringList drivers = QSqlDatabase::drivers();
+        foreach(QString driver,drivers)
+        {
+            qDebug()<<driver << ": " << QSqlDatabase::isDriverAvailable(driver);
+        }
+
+        QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+        if (!QSqlDatabase::isDriverAvailable("QODBC"))
+        {
+            qDebug()<< "driver error";
+            break;
+        }
+        db.setDatabaseName("world");
+        db.setHostName("192.168.11.100");
+        db.setPort(3306);
+        db.setUserName("root");
+        db.setPassword("1234qwer");
+        auto sqlerr = db.lastError();
+        if (!db.open())
+        {
+            qDebug() << sqlerr.text();
+            err = ERR_MYSQL_CONN;
+            break;
+        }
+    } while (0);
+
+    return err;
 }
 
 int CMainApp::Run()

@@ -82,7 +82,9 @@ void CEvHttpServer::handle_callback(evhttp_request *req, void *arg)
             content += std::string(cbuf);
         }
     }
+    std::cout << "--------------------------------------------" << std::endl;
     std::cout << "Content: " << content << std::endl;
+    std::cout << "--------------------------------------------" << std::endl;
 
     // add output response
     struct evkeyvalq *rspheaders = evhttp_request_get_output_headers(req);
