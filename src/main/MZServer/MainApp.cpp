@@ -3,6 +3,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QDebug>
+#include "mysql_com.h"
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -29,11 +30,12 @@ CMainApp::CMainApp()
 #endif
 
     m_httpSvr = std::make_shared<CEvHttpServer>();
+    m_mysql = std::make_shared<CMySQLWrapper>();
 }
 
 CMainApp::~CMainApp()
 {
-
+    Quit();
 }
 
 int CMainApp::Init()
@@ -42,31 +44,30 @@ int CMainApp::Init()
 
     do
     {
-        qDebug()<<"Avaliable drivers;";
-        QStringList drivers = QSqlDatabase::drivers();
-        foreach(QString driver,drivers)
+        std::cout << "db init..." <<std::endl;
+        err = m_mysql->Init();
+        if (err)
         {
-            qDebug()<<driver << ": " << QSqlDatabase::isDriverAvailable(driver);
+            std::cerr << "Error: mysql init err!" <<std::endl;
+            break;
         }
 
-        QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
-        if (!QSqlDatabase::isDriverAvailable("QODBC"))
+        auto conn = m_mysql->GetConnInfo();
+        conn->m_ip = "192.168.8.89";
+        conn->m_port = 3306;
+        conn->m_dbname = "world";
+        conn->m_usrname = "root";
+        conn->m_passwd = "1234qwer";
+
+        std::cout << "db connect..." <<std::endl;
+        err = m_mysql->Connect();
+        if (err)
         {
-            qDebug()<< "driver error";
+            std::cout << "Error: mysql connect err : " << err << " " << m_mysql->GetMySQLError() <<std::endl;
             break;
         }
-        db.setDatabaseName("world");
-        db.setHostName("192.168.11.100");
-        db.setPort(3306);
-        db.setUserName("root");
-        db.setPassword("1234qwer");
-        auto sqlerr = db.lastError();
-        if (!db.open())
-        {
-            qDebug() << sqlerr.text();
-            err = ERR_MYSQL_CONN;
-            break;
-        }
+        std::cout << "db connect ok" <<std::endl;
+
     } while (0);
 
     return err;
@@ -82,5 +83,6 @@ int CMainApp::Run()
 
 int CMainApp::Quit()
 {
+    m_mysql->Release();
     return ERR_SUCCESS;
 }

@@ -3,6 +3,7 @@
 
 #define ERR_SUCCESS 0
 #define ERR_INVALIDE_PARAM 1
-#define ERR_MYSQL_CONN 2
+#define ERR_MYSQL_INIT 2
+#define ERR_MYSQL_CONN 3
 
 #endif // SERVERERRDEF_H

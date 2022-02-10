@@ -2,6 +2,7 @@
 #define CMAINAPP_H
 
 #include <libevent/EvHttpWrapper.h>
+#include <libmysql/MySQLWrapper.h>
 
 class CMainApp
 {
@@ -16,7 +17,7 @@ public:
 
 private:
     evhttp_ptr m_httpSvr{nullptr};
-
+    mysql_ptr m_mysql{nullptr};
 };
 
 #endif // CMAINAPP_H
