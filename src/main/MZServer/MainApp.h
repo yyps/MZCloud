@@ -2,7 +2,7 @@
 #define CMAINAPP_H
 
 #include <libevent/EvHttpWrapper.h>
-#include <libmysql/MySQLWrapper.h>
+#include <mysql/MySQLWrapper.h>
 
 class CMainApp
 {

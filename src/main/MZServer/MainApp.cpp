@@ -86,3 +86,77 @@ int CMainApp::Quit()
     m_mysql->Release();
     return ERR_SUCCESS;
 }
+
+
+//typedef std::shared_ptr<sql::Connection> connection_ptr;
+//typedef std::shared_ptr<sql::Statement> statement_ptr;
+//typedef  std::shared_ptr<sql::ResultSet> resultset_ptr;
+
+//void show_statment_meta(statement_ptr stmtptr)
+//{
+//    //cout << "MaxFieldSize: " << stmtptr->getMaxFieldSize() << endl;
+//    //cout << "MaxRows: " << stmtptr->getMaxRows() << endl;
+//    //cout << "FetchSize: " << stmtptr->getFetchSize() << endl;
+//}
+
+//int main(int argc, char *argv[])
+//{
+//    QCoreApplication a(argc, argv);
+
+//    sql::mysql::MySQL_Driver *driver = 0;
+//    sql::Connection *conn_ = 0;
+
+//    try
+//    {
+//        do
+//        {
+//            driver = sql::mysql::get_mysql_driver_instance();
+//            conn_ = driver->connect("tcp://192.168.8.89:3306", "root", "1234qwer");
+//            connection_ptr conn(conn_);
+//            cout << "连接成功" << endl;
+
+//            sql::Statement *stat_ = conn->createStatement();
+//            statement_ptr stmtptr(stat_);
+//            conn->setSchema("world");
+//            bool b = stmtptr->execute("select * from city");
+//            //bool b = stmtptr->execute("update city set Name='Hebron_guojianguang' where ID=4076");
+//            if (b)
+//            {
+//                do
+//                {
+//                    auto result = stmtptr->getResultSet();
+//                    resultset_ptr rsptr(result);
+//                    cout << "Recive " << rsptr->rowsCount() << " rows." << endl;
+//                    while (rsptr->next())
+//                        cout << rsptr->getString(1) << "|" << rsptr->getString(2) << "|" << rsptr->getString(3) << endl;
+//                } while (stmtptr->getMoreResults());
+//            }
+//            else
+//            {
+//                cout << "Update " << stmtptr->getUpdateCount() << " rows." << endl;
+//            }
+//        } while (0);
+//    }
+//    catch (sql::SQLException &e)
+//    {
+//        cout << "ERROR: " << e.what();
+//        cout << " (MySQL error code: " << e.getErrorCode();
+//        cout << ", SQLState: " << e.getSQLState() << ")" << endl;
+
+//        if (e.getErrorCode() == 1047)
+//        {
+//            /*
+//            Error: 1047 SQLSTATE: 08S01 (ER_UNKNOWN_COM_ERROR)
+//            Message: Unknown command
+//            */
+//            cout << "/nYour server does not seem to support Prepared Statements at all. ";
+//            cout << "Perhaps MYSQL < 4.1?" << endl;
+//        }
+//    }
+//    catch (...)
+//    {
+//        cout << "连接失败" << endl;
+//    }
+
+//    return 0;
+//}

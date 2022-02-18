@@ -105,6 +105,7 @@ HEADERS += \
     ../../common/include/libmysql/my_thread_local.h \
     ../../common/include/libmysql/my_xml.h \
     ../../common/include/libmysql/mysql.h \
+    ../../common/include/libmysql/mysql/MySQLWrapper.h \
     ../../common/include/libmysql/mysql/client_authentication.h \
     ../../common/include/libmysql/mysql/client_plugin.h \
     ../../common/include/libmysql/mysql/client_plugin.h.pp \
